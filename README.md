@@ -18,7 +18,7 @@ Open Smart Attendance Tracker.html in any modern web browser (Chrome, Edge, Fire
 ## 🌐 Live Demo
 You can also view it online via GitHub Pages:  
 
-👉 [Click here](https://your-username.github.io/your-repository-name/)
+👉 [Click here]((https://srinath-69.github.io/Smart-Attendace-Tracker/))
 
 
 📂 Features
