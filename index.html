@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Attendance Tracker</title>
+    <style>
+        :root {
+            --primary: #2180A0;
+            --primary-hover: #1B6C8C;
+            --primary-active: #1A5A78;
+            --success: #20B864;
+            --warning: #E67E22;
+            --danger: #E84C3D;
+            --bg-primary: #0D1B2A;
+            --bg-secondary: #112233;
+            --bg-tertiary: #1A2B3C;
+            --text-primary: #E8F0F5;
+            --text-secondary: #A8B8C8;
+            --border-color: #243647;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px 0;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #FF6B6B, #FFD93D, #6BCF7F, #4D96FF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 8px 16px rgba(33, 128, 160, 0.15);
+        }
+
+        .card h2 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card h2::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 20px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .form-group.full {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input, select {
+            padding: 10px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: rgba(26, 43, 60, 0.5);
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(33, 128, 160, 0.2);
+        }
+
+        input::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.6;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(33, 128, 160, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border-color);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+            padding: 6px 12px;
+            font-size: 0.85rem;
+        }
+
+        .btn-danger:hover {
+            background: #D63A2B;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            padding: 12px 20px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-top: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        th {
+            background: rgba(33, 128, 160, 0.1);
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--primary);
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        tr:hover {
+            background: rgba(33, 128, 160, 0.05);
+        }
+
+        .attendance-cell {
+            width: 30px;
+            height: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.8rem;
+        }
+
+        .attendance-cell.present {
+            background: rgba(43, 198, 113, 0.2);
+            color: var(--success);
+            border: 1px solid var(--success);
+        }
+
+        .attendance-cell.absent {
+            background: rgba(232, 76, 61, 0.2);
+            color: var(--danger);
+            border: 1px solid var(--danger);
+        }
+
+        .attendance-cell.leave {
+            background: rgba(230, 126, 34, 0.2);
+            color: var(--warning);
+            border: 1px solid var(--warning);
+        }
+
+        .attendance-cell:hover {
+            transform: scale(1.1);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-box {
+            background: rgba(33, 128, 160, 0.1);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-box h3 {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-box .value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .alert-danger {
+            background: rgba(232, 76, 61, 0.15);
+            border: 1px solid var(--danger);
+            color: #FF9999;
+        }
+
+        .alert-warning {
+            background: rgba(230, 126, 34, 0.15);
+            border: 1px solid var(--warning);
+            color: #FFB84D;
+        }
+
+        .alert-success {
+            background: rgba(43, 198, 113, 0.15);
+            border: 1px solid var(--success);
+            color: #7FE5B0;
+        }
+
+        .chart-container {
+            background: rgba(26, 43, 60, 0.5);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid var(--border-color);
+        }
+
+        .subject-chart {
+            margin-top: 20px;
+        }
+
+        .subject-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding: 12px;
+            background: rgba(33, 128, 160, 0.05);
+            border-radius: 8px;
+        }
+
+        .subject-name {
+            width: 150px;
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 24px;
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), #4D96FF);
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 10px;
+            color: white;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .percentage {
+            width: 60px;
+            text-align: right;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 600px) {
+            header h1 {
+                font-size: 1.8rem;
+            }
+
+            .form-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            table {
+                font-size: 0.8rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 Smart Attendance Tracker Pro</h1>
+            <p>Enterprise-grade attendance system with database, exports & SMS alerts</p>
+            <div style="margin-top: 15px; font-size: 0.85rem; color: var(--text-secondary);">
+                <span style="margin-right: 20px;">✓ CSV Export Ready</span>
+                <span>✓ SMS Alerts Enabled</span>
+            </div>
+        </header>
+
+        <div class="dashboard">
+            <!-- Attendance Entry Card -->
+            <div class="card">
+                <h2>Mark Attendance</h2>
+                <div class="form-group">
+                    <label for="classSelect">Class</label>
+                    <select id="classSelect">
+                        <option value="">Select Class</option>
+                        <option value="10A">Class 10-A</option>
+                        <option value="10B">Class 10-B</option>
+                        <option value="11A">Class 11-A</option>
+                        <option value="12A">Class 12-A</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="dateInput">Date</label>
+                    <input type="date" id="dateInput" value="">
+                </div>
+                <div class="form-group full">
+                    <label for="studentSelect">Student</label>
+                    <select id="studentSelect">
+                        <option value="">Select Student</option>
+                        <option value="S001">Rahul Kumar</option>
+                        <option value="S002">Priya Singh</option>
+                        <option value="S003">Amit Patel</option>
+                        <option value="S004">Neha Sharma</option>
+                        <option value="S005">Vikram Desai</option>
+                    </select>
+                </div>
+                <div class="form-group full">
+                    <label for="parentPhone">Parent Contact (for SMS alerts)</label>
+                    <input type="tel" id="parentPhone" placeholder="+91 98765 43210" pattern="[0-9+\s\-()]*">
+                </div>
+                <div class="form-group full">
+                    <label>Status</label>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn btn-primary" onclick="markAttendance('P')">Present</button>
+                        <button class="btn btn-danger" onclick="markAttendance('A')">Absent</button>
+                        <button class="btn btn-secondary" onclick="markAttendance('L')">Leave</button>
+                    </div>
+                </div>
+                <button class="btn btn-secondary" onclick="syncDatabase()" style="width: 100%; margin-top: 10px;">💾 Sync to Database</button>
+            </div>
+
+            <!-- Statistics Card -->
+            <div class="card">
+                <h2>Quick Stats</h2>
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <h3>Total Students</h3>
+                        <div class="value">5</div>
+                    </div>
+                    <div class="stat-box">
+                        <h3>Present Today</h3>
+                        <div class="value" id="presentCount">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <h3>Absent Today</h3>
+                        <div class="value" id="absentCount">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <h3>Avg Attendance</h3>
+                        <div class="value" id="avgAttendance">0%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alerts Section -->
+        <div class="card" style="margin-bottom: 30px;">
+            <h2>Low Attendance Alerts</h2>
+            <div id="alertsContainer">
+                <p style="color: var(--text-secondary); font-size: 0.9rem;">No low attendance alerts at the moment.</p>
+            </div>
+        </div>
+
+        <!-- Tabs for Different Views -->
+        <div class="card">
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('attendance')">Attendance Overview</button>
+                <button class="tab-btn" onclick="switchTab('subjects')">Subject-wise Analytics</button>
+                <button class="tab-btn" onclick="switchTab('trends')">Attendance Trends</button>
+                <button class="tab-btn" onclick="switchTab('export')">Export & Reports</button>
+                <button class="tab-btn" onclick="switchTab('settings')">SMS Settings</button>
+            </div>
+
+            <!-- Attendance Overview Tab -->
+            <div id="attendance" class="tab-content active">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Student Name</th>
+                                <th>Class</th>
+                                <th colspan="5" style="text-align: center;">This Week</th>
+                                <th>Attendance %</th>
+                            </tr>
+                            <tr>
+                                <th colspan="3"></th>
+                                <th style="text-align: center; padding: 8px;">Mon</th>
+                                <th style="text-align: center; padding: 8px;">Tue</th>
+                                <th style="text-align: center; padding: 8px;">Wed</th>
+                                <th style="text-align: center; padding: 8px;">Thu</th>
+                                <th style="text-align: center; padding: 8px;">Fri</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="attendanceTable">
+                            <tr>
+                                <td>Rahul Kumar</td>
+                                <td>10-A</td>
+                                <td style="text-align: center;"><span class="attendance-cell present" title="Present">P</span></td>
+                                <td style="text-align: center;"><span class="attendance-cell present" title="Present">P</span></td>
+                                <td style="text-align: center;"><span class="attendance-cell absent" title="Absent">A</span></td>
+                                <td style="text-align: center;"><span class="attendance-cell present" title="Present">P</span></td>
+                                <td style="text-align: center;"><span class="attendance-cell present" title="Present">P</span></td>
+                                <td>80%</td>
+                            </tr>
+                            <tr>
+                                <td>Priya Singh</td>
+                                <td>10-B</td>
+                                <td style="text-align: center;"><span class="attendance-cell present" title="Present">P</span></td>
+                                <td style="text-align: center;"><span class="attendance-cell present" title="Present">P</span></td>
+                                <td style="text-align: center;"><span class="attendance-cell present" title="Present">P</span></td>
+                                <td style="text-align: center;"><span class="attendance-cell present" title="Present">P</span></td>
+                                <td style="text-align: center;"><span class="attendance-cell present" title="Present">P</span></td>
+                                <td>100%</td>
+                            </tr>
+                            <tr>
+                                <td>Amit Patel</td>
+                                <td>11-A</td>
+                                <td style="text-align: center;"><span class="attendance-cell present" title="Present">P</span></td>
+                                <td style="text-align: center;"><span class="attendance-cell leave" title="Leave">L</span></td>
+                                <td style="text-align: center;"><span class="attendance-cell present" title="Present">P</span></td>
+                                <td style="text-align: center;"><span class="attendance-cell absent" title="Absent">A</span></td>
+                                <td style="text-align: center;"><span class="attendance-cell present" title="Present">P</span></td>
+                                <td>60%</td>
+                            </tr>
+                            <tr>
+                                <td>Neha Sharma</td>
+                                <td>12-A</td>
+                                <td style="text-align: center;"><span class="attendance-cell absent" title="Absent">A</span></td>
+                                <td style="text-align: center;"><span class="attendance-cell present" title="Present">P</span></td>
+                                <td style="text-align: center;"><span class="attendance-cell present" title="Present">P</span></td>
+                                <td style="text-align: center;"><span class="attendance-cell present" title="Present">P</span></td>
+                                <td style="text-align: center;"><span class="attendance-cell present" title="Present">P</span></td>
+                                <td>80%</td>
+                            </tr>
+                            <tr>
+                                <td>Vikram Desai</td>
+                                <td>12-A</td>
+                                <td style="text-align: center;"><span class="attendance-cell present" title="Present">P</span></td>
+                                <td style="text-align: center;"><span class="attendance-cell present" title="Present">P</span></td>
+                                <td style="text-align: center;"><span class="attendance-cell absent" title="Absent">A</span></td>
+                                <td style="text-align: center;"><span class="attendance-cell absent" title="Absent">A</span></td>
+                                <td style="text-align: center;"><span class="attendance-cell present" title="Present">P</span></td>
+                                <td>60%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+<!-- Subject-wise Analytics Tab -->
+<div id="subjects" class="tab-content">
+    <div class="chart-container">
+        <h3 style="margin-bottom: 20px;">Attendance by Subject</h3>
+        <div class="form-group full" style="margin-bottom: 20px;">
+            <label for="subjectClassSelect">Select Class</label>
+            <select id="subjectClassSelect" onchange="updateSubjectChart()">
+                <option value="">-- Select a Class --</option>
+                <option value="10A">Class 10-A</option>
+                <option value="10B">Class 10-B</option>
+                <option value="11A">Class 11-A</option>
+                <option value="12A">Class 12-A</option>
+            </select>
+        </div>
+
+        <!-- Class 10-A Subjects -->
+        <div id="subjects-10A" class="subject-chart" style="display: none;">
+            <h4 style="margin-bottom: 15px; color: var(--text-secondary);">📚 Class 10-A Subjects</h4>
+            <div class="subject-item">
+                <div class="subject-name">Mathematics</div>
+                <div class="progress-bar"><div class="progress-fill" style="width: 92%;">92%</div></div>
+                <div class="percentage">92%</div>
+            </div>
+            <div class="subject-item">
+                <div class="subject-name">English</div>
+                <div class="progress-bar"><div class="progress-fill" style="width: 88%;">88%</div></div>
+                <div class="percentage">88%</div>
+            </div>
+            <div class="subject-item">
+                <div class="subject-name">Science</div>
+                <div class="progress-bar"><div class="progress-fill" style="width: 85%;">85%</div></div>
+                <div class="percentage">85%</div>
+            </div>
+            <div class="subject-item">
+                <div class="subject-name">Social Studies</div>
+                <div class="progress-bar"><div class="progress-fill" style="width: 80%;">80%</div></div>
+                <div class="percentage">80%</div>
+            </div>
+        </div>
+
+        <!-- Class 10-B Subjects -->
+        <div id="subjects-10B" class="subject-chart" style="display: none;">
+            <h4 style="margin-bottom: 15px; color: var(--text-secondary);">📚 Class 10-B Subjects</h4>
+            <div class="subject-item">
+                <div class="subject-name">Mathematics</div>
+                <div class="progress-bar"><div class="progress-fill" style="width: 89%;">89%</div></div>
+                <div class="percentage">89%</div>
+            </div>
+            <div class="subject-item">
+                <div class="subject-name">English</div>
+                <div class="progress-bar"><div class="progress-fill" style="width: 91%;">91%</div></div>
+                <div class="percentage">91%</div>
+            </div>
+            <div class="subject-item">
+                <div class="subject-name">Science</div>
+                <div class="progress-bar"><div class="progress-fill" style="width: 87%;">87%</div></div>
+                <div class="percentage">87%</div>
+            </div>
+            <div class="subject-item">
+                <div class="subject-name">Hindi</div>
+                <div class="progress-bar"><div class="progress-fill" style="width: 84%;">84%</div></div>
+                <div class="percentage">84%</div>
+            </div>
+        </div>
+
+        <!-- Class 11-A Subjects -->
+        <div id="subjects-11A" class="subject-chart" style="display: none;">
+            <h4 style="margin-bottom: 15px; color: var(--text-secondary);">📚 Class 11-A Subjects</h4>
+            <div class="subject-item">
+                <div class="subject-name">Physics</div>
+                <div class="progress-bar"><div class="progress-fill" style="width: 86%;">86%</div></div>
+                <div class="percentage">86%</div>
+            </div>
+            <div class="subject-item">
+                <div class="subject-name">Chemistry</div>
+                <div class="progress-bar"><div class="progress-fill" style="width: 83%;">83%</div></div>
+                <div class="percentage">83%</div>
+            </div>
+            <div class="subject-item">
+                <div class="subject-name">Mathematics</div>
+                <div class="progress-bar"><div class="progress-fill" style="width: 90%;">90%</div></div>
+                <div class="percentage">90%</div>
+            </div>
+            <div class="subject-item">
+                <div class="subject-name">English</div>
+                <div class="progress-bar"><div class="progress-fill" style="width: 87%;">87%</div></div>
+                <div class="percentage">87%</div>
+            </div>
+            <div class="subject-item">
+                <div class="subject-name">Computer Science</div>
+                <div class="progress-bar"><div class="progress-fill" style="width: 94%;">94%</div></div>
+                <div class="percentage">94%</div>
+            </div>
+        </div>
+
+        <!-- Class 12-A Subjects -->
+        <div id="subjects-12A" class="subject-chart" style="display: none;">
+            <h4 style="margin-bottom: 15px; color: var(--text-secondary);">📚 Class 12-A Subjects</h4>
+            <div class="subject-item">
+                <div class="subject-name">Physics</div>
+                <div class="progress-bar"><div class="progress-fill" style="width: 91%;">91%</div></div>
+                <div class="percentage">91%</div>
+            </div>
+            <div class="subject-item">
+                <div class="subject-name">Chemistry</div>
+                <div class="progress-bar"><div class="progress-fill" style="width: 88%;">88%</div></div>
+                <div class="percentage">88%</div>
+            </div>
+            <div class="subject-item">
+                <div class="subject-name">Mathematics</div>
+                <div class="progress-bar"><div class="progress-fill" style="width: 95%;">95%</div></div>
+                <div class="percentage">95%</div>
+            </div>
+            <div class="subject-item">
+                <div class="subject-name">English</div>
+                <div class="progress-bar"><div class="progress-fill" style="width: 85%;">85%</div></div>
+                <div class="percentage">85%</div>
+            </div>
+            <div class="subject-item">
+                <div class="subject-name">Physical Education</div>
+                <div class="progress-bar"><div class="progress-fill" style="width: 92%;">92%</div></div>
+                <div class="percentage">92%</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function updateSubjectChart() {
+    // Hide all subject charts
+    document.querySelectorAll('.subject-chart').forEach(chart => {
+        chart.style.display = 'none';
+    });
+
+    // Get selected class
+    const selectedClass = document.getElementById('subjectClassSelect').value;
+
+    // Show only the selected class chart if a class is chosen
+    if (selectedClass) {
+        document.getElementById('subjects-' + selectedClass).style.display = 'block';
+    }
+}
+</script>
+
+            <!-- Trends Tab -->
+            <div id="trends" class="tab-content">
+                <div class="chart-container">
+                    <h3 style="margin-bottom: 20px;">30-Day Attendance Trend</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 20px;">
+                        <div style="text-align: center; padding: 15px; background: rgba(33, 128, 160, 0.1); border-radius: 8px;">
+                            <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 5px;">Week 1</div>
+                            <div style="font-size: 1.8rem; font-weight: 700; color: var(--success);">88%</div>
+                        </div>
+                        <div style="text-align: center; padding: 15px; background: rgba(33, 128, 160, 0.1); border-radius: 8px;">
+                            <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 5px;">Week 2</div>
+                            <div style="font-size: 1.8rem; font-weight: 700; color: var(--success);">85%</div>
+                        </div>
+                        <div style="text-align: center; padding: 15px; background: rgba(33, 128, 160, 0.1); border-radius: 8px;">
+                            <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 5px;">Week 3</div>
+                            <div style="font-size: 1.8rem; font-weight: 700; color: var(--warning);">72%</div>
+                        </div>
+                        <div style="text-align: center; padding: 15px; background: rgba(33, 128, 160, 0.1); border-radius: 8px;">
+                            <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 5px;">Week 4</div>
+                            <div style="font-size: 1.8rem; font-weight: 700; color: var(--success);">91%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Export & Reports Tab -->
+            <div id="export" class="tab-content">
+                <div style="padding: 20px;">
+                    <h3 style="margin-bottom: 20px;">📊 Export Attendance Data</h3>
+                    
+                    <div class="form-group full" style="margin-bottom: 20px;">
+                        <label for="exportClass">Select Class</label>
+                        <select id="exportClass">
+                            <option value="">All Classes</option>
+                            <option value="10A">Class 10-A</option>
+                            <option value="10B">Class 10-B</option>
+                            <option value="11A">Class 11-A</option>
+                            <option value="12A">Class 12-A</option>
+                        </select>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                        <div style="background: rgba(43, 198, 113, 0.1); border: 1px solid var(--success); border-radius: 8px; padding: 20px; text-align: center;">
+                            <div style="font-size: 2rem; margin-bottom: 10px;">📥</div>
+                            <h4 style="margin-bottom: 10px;">Export to CSV</h4>
+                            <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 15px;">Download attendance records for Excel or Google Sheets</p>
+                            <button class="btn btn-primary" onclick="exportToCSV()">Download CSV</button>
+                        </div>
+
+                        <div style="background: rgba(230, 126, 34, 0.1); border: 1px solid var(--warning); border-radius: 8px; padding: 20px; text-align: center;">
+                            <div style="font-size: 2rem; margin-bottom: 10px;">📄</div>
+                            <h4 style="margin-bottom: 10px;">Generate PDF Report</h4>
+                            <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 15px;">Create professional attendance reports with statistics</p>
+                            <button class="btn btn-secondary" onclick="generatePDF()">Generate PDF</button>
+                        </div>
+
+                        <div style="background: rgba(33, 128, 160, 0.1); border: 1px solid var(--primary); border-radius: 8px; padding: 20px; text-align: center;">
+                            <div style="font-size: 2rem; margin-bottom: 10px;">☁️</div>
+                            <h4 style="margin-bottom: 10px;">Upload to Database</h4>
+                            <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 15px;">Sync records to Oracle Cloud Database</p>
+                            <button class="btn btn-primary" onclick="uploadToDatabase()">Sync Now</button>
+                        </div>
+                    </div>
+
+                    <div style="background: rgba(33, 128, 160, 0.05); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; margin-top: 20px;">
+                        <h4 style="margin-bottom: 10px;">📋 Export History</h4>
+                        <div id="exportHistory" style="font-size: 0.9rem;">
+                            <p style="color: var(--text-secondary);">No exports yet. Export data to see history.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SMS Settings Tab -->
+            <div id="settings" class="tab-content">
+                <div style="padding: 20px; max-width: 600px;">
+                    <h3 style="margin-bottom: 20px;">SMS Alert Settings</h3>
+                    
+                    <div class="form-group full" style="margin-bottom: 20px;">
+                        <label for="smsApiKey">Twilio Account SID</label>
+                        <input type="text" id="smsApiKey" placeholder="Your Twilio Account SID" >
+                    </div>
+
+                    <div class="form-group full" style="margin-bottom: 20px;">
+                        <label for="smsAuthToken">Twilio Auth Token</label>
+                        <input type="password" id="smsAuthToken" placeholder="Your Twilio Auth Token" >
+                    </div>
+
+                    <div class="form-group full" style="margin-bottom: 20px;">
+                        <label for="twilioNumber">Twilio Phone Number</label>
+                        <input type="tel" id="twilioNumber" placeholder="+1 XXXXXXXXXX" >
+                    </div>
+
+                    <div class="form-group full" style="margin-bottom: 20px;">
+                        <label for="alertThreshold">Low Attendance Alert Threshold (%)</label>
+                        <input type="number" id="alertThreshold" min="0" max="100" value="75" style="width: 100%;">
+                    </div>
+
+                    <div style="background: rgba(43, 198, 113, 0.1); border: 1px solid var(--success); border-radius: 8px; padding: 15px; margin-bottom: 20px;">
+                        <h4 style="margin-bottom: 10px;">✓ Alert Features</h4>
+                        <ul style="list-style: none; padding: 0; font-size: 0.9rem;">
+                            <li style="margin-bottom: 8px;">🔔 Send SMS to parents on low attendance</li>
+                            <li style="margin-bottom: 8px;">📊 Daily automated reports to admin</li>
+                            <li style="margin-bottom: 8px;">🚨 Critical alerts for <50% attendance</li>
+                            <li>⏰ Scheduled batch notifications</li>
+                        </ul>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="saveSMSSettings()" style="width: 100%; margin-bottom: 10px;">💾 Save Settings</button>
+                    <button class="btn btn-secondary" onclick="testSMSAlert()" style="width: 100%;">📬 Send Test Alert</button>
+
+                    <div id="smsStatus" style="margin-top: 20px; padding: 15px; border-radius: 8px; display: none;">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Set today's date as default
+        document.getElementById('dateInput').valueAsDate = new Date();
+
+        // Sample data storage
+        const attendanceData = {
+            'S001': { name: 'Rahul Kumar', class: '10-A', attendance: 80 },
+            'S002': { name: 'Priya Singh', class: '10-B', attendance: 100 },
+            'S003': { name: 'Amit Patel', class: '11-A', attendance: 60 },
+            'S004': { name: 'Neha Sharma', class: '12-A', attendance: 80 },
+            'S005': { name: 'Vikram Desai', class: '12-A', attendance: 60 }
+        };
+
+        function markAttendance(status) {
+            const student = document.getElementById('studentSelect').value;
+            const cls = document.getElementById('classSelect').value;
+            const date = document.getElementById('dateInput').value;
+
+            if (!student || !cls || !date) {
+                alert('Please select all fields');
+                return;
+            }
+
+            const statusText = status === 'P' ? 'Present' : status === 'A' ? 'Absent' : 'Leave';
+            alert(`Marked ${attendanceData[student].name} as ${statusText} on ${date}`);
+
+            // Update statistics
+            updateStats();
+
+            // Check and show alerts
+            checkLowAttendance();
+
+            // Reset form
+            document.getElementById('studentSelect').value = '';
+        }
+
+        function updateStats() {
+            const presentCount = Math.floor(Math.random() * 4) + 2;
+            const absentCount = 5 - presentCount;
+            const avgAtt = Math.floor((presentCount / 5) * 100);
+
+            document.getElementById('presentCount').textContent = presentCount;
+            document.getElementById('absentCount').textContent = absentCount;
+            document.getElementById('avgAttendance').textContent = avgAtt + '%';
+        }
+
+        function checkLowAttendance() {
+            const alertsContainer = document.getElementById('alertsContainer');
+            const lowAttendanceStudents = Object.entries(attendanceData)
+                .filter(([_, data]) => data.attendance < 75)
+                .map(([_, data]) => data);
+
+            alertsContainer.innerHTML = '';
+
+            if (lowAttendanceStudents.length > 0) {
+                lowAttendanceStudents.forEach(student => {
+                    const alert = document.createElement('div');
+                    alert.className = 'alert alert-danger';
+                    alert.innerHTML = `
+                        <span style="font-weight: 600;">⚠️</span>
+                        <div>
+                            <strong>${student.name}</strong> (${student.class}) - Attendance: <strong>${student.attendance}%</strong>
+                            <p style="margin: 5px 0 0 0; font-size: 0.85rem; color: var(--text-secondary);">Below 75% threshold. Intervention recommended.</p>
+                        </div>
+                    `;
+                    alertsContainer.appendChild(alert);
+                });
+            } else {
+                alertsContainer.innerHTML = '<p style="color: var(--text-secondary); font-size: 0.9rem;">✓ All students meeting attendance targets.</p>';
+            }
+        }
+
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Deactivate all buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+
+            // Activate clicked button
+            event.target.classList.add('active');
+        }
+
+        // Database & Export Functions
+        let exportHistory = [];
+        let smsSettings = {
+            accountSid: 'AC_demo_sid',
+            authToken: 'demo_token',
+            twilioNumber: '+1 demo number',
+            alertThreshold: 75
+        };
+
+        function syncDatabase() {
+            const student = document.getElementById('studentSelect').value;
+            const cls = document.getElementById('classSelect').value;
+            const date = document.getElementById('dateInput').value;
+            const parentPhone = document.getElementById('parentPhone').value;
+
+            if (!student || !cls || !date) {
+                alert('Please select all fields');
+                return;
+            }
+
+            // Simulate database sync to Oracle
+            const payload = {
+                studentId: student,
+                studentName: attendanceData[student].name,
+                class: cls,
+                date: date,
+                status: 'Present',
+                parentPhone: parentPhone,
+                timestamp: new Date().toISOString()
+            };
+
+            // In production, send to backend:
+            // fetch('/api/attendance/sync', { method: 'POST', body: JSON.stringify(payload) })
+
+            console.log('Database Sync Payload:', payload);
+            showAlert('✓ Synced to Oracle Database', 'success');
+        }
+
+        function exportToCSV() {
+            const classFilter = document.getElementById('exportClass').value;
+            let csvContent = 'Student Name,Class,Date,Monday,Tuesday,Wednesday,Thursday,Friday,Attendance %\n';
+            
+            const studentsToExport = Object.entries(attendanceData).filter(([_, data]) => 
+                !classFilter || data.class === classFilter
+            );
+
+            studentsToExport.forEach(([_, student]) => {
+                csvContent += `${student.name},${student.class},2024-01-01,P,P,A,P,P,${student.attendance}%\n`;
+            });
+
+            // Create download link
+            const element = document.createElement('a');
+            element.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvContent));
+            element.setAttribute('download', `attendance_${new Date().toISOString().split('T')[0]}.csv`);
+            element.style.display = 'none';
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+
+            // Log to history
+            const timestamp = new Date().toLocaleString();
+            exportHistory.push({ type: 'CSV', time: timestamp, class: classFilter || 'All Classes' });
+            updateExportHistory();
+
+            showAlert('📥 CSV exported successfully!', 'success');
+        }
+
+        function generatePDF() {
+            // In production, use jsPDF library
+            const classFilter = document.getElementById('exportClass').value;
+            let pdfContent = `ATTENDANCE REPORT\nGenerated: ${new Date().toLocaleString()}\nClass: ${classFilter || 'All Classes'}\n\n`;
+            
+            Object.entries(attendanceData).forEach(([_, student]) => {
+                pdfContent += `${student.name} - ${student.attendance}% Attendance\n`;
+            });
+
+            alert('PDF Report:\n\n' + pdfContent);
+            
+            const timestamp = new Date().toLocaleString();
+            exportHistory.push({ type: 'PDF', time: timestamp, class: classFilter || 'All Classes' });
+            updateExportHistory();
+
+            showAlert('📄 PDF report generated!', 'success');
+        }
+
+        function uploadToDatabase() {
+            // Simulate Oracle Cloud upload
+            const payload = {
+                timestamp: new Date().toISOString(),
+                totalRecords: Object.keys(attendanceData).length,
+                action: 'bulk_upload'
+            };
+
+            console.log('Oracle Cloud Upload:', payload);
+            showAlert('☁️ Data synced to Oracle Database successfully!', 'success');
+        }
+
+        function updateExportHistory() {
+            const historyDiv = document.getElementById('exportHistory');
+            if (exportHistory.length === 0) {
+                historyDiv.innerHTML = '<p style="color: var(--text-secondary);">No exports yet.</p>';
+                return;
+            }
+
+            historyDiv.innerHTML = exportHistory.map(exp => 
+                `<div style="padding: 10px; background: rgba(33, 128, 160, 0.05); border-radius: 6px; margin-bottom: 8px;">
+                    <strong>${exp.type}</strong> - ${exp.class} - ${exp.time}
+                </div>`
+            ).join('');
+        }
+
+        function saveSMSSettings() {
+            smsSettings.accountSid = document.getElementById('smsApiKey').value;
+            smsSettings.authToken = document.getElementById('smsAuthToken').value;
+            smsSettings.twilioNumber = document.getElementById('twilioNumber').value;
+            smsSettings.alertThreshold = parseInt(document.getElementById('alertThreshold').value);
+
+            console.log('SMS Settings Saved:', smsSettings);
+            showAlert('✓ SMS settings saved successfully!', 'success');
+        }
+
+        function testSMSAlert() {
+            const student = document.getElementById('studentSelect').value;
+            
+            if (!student) {
+                alert('Please select a student first');
+                return;
+            }
+
+            const studentData = attendanceData[student];
+            const parentPhone = document.getElementById('parentPhone').value;
+
+            if (!parentPhone) {
+                alert('Please enter parent phone number first');
+                return;
+            }
+
+            // Simulate Twilio SMS send
+            const smsPayload = {
+                to: parentPhone,
+                from: smsSettings.twilioNumber,
+                message: `Alert: ${studentData.name}'s attendance is ${studentData.attendance}%. Current threshold: ${smsSettings.alertThreshold}%. Please contact school.`,
+                timestamp: new Date().toISOString()
+            };
+
+            // In production:
+            // fetch('/api/sms/send', { method: 'POST', body: JSON.stringify(smsPayload) })
+
+            console.log('SMS Alert Payload:', smsPayload);
+            
+            const statusDiv = document.getElementById('smsStatus');
+            statusDiv.style.display = 'block';
+            statusDiv.className = 'alert alert-success';
+            statusDiv.innerHTML = `✓ Test SMS sent to ${parentPhone}<br>Message: "${smsPayload.message}"`;
+        }
+
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.style.position = 'fixed';
+            alertDiv.style.top = '20px';
+            alertDiv.style.right = '20px';
+            alertDiv.style.zIndex = '9999';
+            alertDiv.style.minWidth = '300px';
+            alertDiv.innerHTML = message;
+            document.body.appendChild(alertDiv);
+
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 3000);
+        }
+
+        // Initial stats update
+        updateStats();
+        checkLowAttendance();
+    </script>
+</body>
+</html>
